@@ -10,30 +10,30 @@ enum PieceType {
 
 class Piece {
 
-  PieceType? type;
   int position;
+  int type;
   
   Piece({
-    this.type = PieceType.empty,
-    required this.position
+    required this.position,
+    required this.type,
   });
 
   int get row => position ~/ 8;
 
   int get col => position % 8;
 
-  int get num => type!.index;
+  bool get path => type > 0;
 
-  bool get path => (col + row) % 2 == 0;
+  bool get player => pieceType == PieceType.black || pieceType == PieceType.white;
+  
+  PieceType get pieceType => PieceType.values[type];
 
-  bool get player => type == PieceType.black || type == PieceType.white;
+  String get name => pieceType.name.characters.first.toUpperCase();
 
   String get label => "$position";
 
-  String get name => type!.name.characters.first.toUpperCase();
-
   void log() {
-    print("($row, $col) / $position / ${type?.name}");
+    print("($row, $col) / $position / ${pieceType.name}");
   }
 
 }

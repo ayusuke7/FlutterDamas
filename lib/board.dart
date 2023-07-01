@@ -12,21 +12,31 @@ class BoardGame extends StatefulWidget {
 
 class _BoardGameState extends State<BoardGame> {
 
-  List<Piece> board = List.generate(64, (pos){
-    var piece = Piece(position: pos);
-    var white = [41, 43, 45, 47, 48, 50, 52, 54, 57, 59, 61, 63];
-    var black = [0, 2, 4, 6, 9, 11, 13, 15, 16, 18, 20, 22];
-    if (black.contains(pos)) {
-      piece.type = PieceType.black;
-    } else
-    if (white.contains(pos)) {
-      piece.type = PieceType.white;
-    } else 
-    if (piece.path) {
-      piece.type = PieceType.path;
-    } 
-    return piece;
-  });
+  // List<Piece> board1 = List.generate(64, (pos){
+  //   var piece = Piece(position: pos);
+  //   var white = [41, 43, 45, 47, 48, 50, 52, 54, 57, 59, 61, 63];
+  //   var black = [0, 2, 4, 6, 9, 11, 13, 15, 16, 18, 20, 22];
+  //   if (black.contains(pos)) {
+  //     piece.type = PieceType.black;
+  //   } else
+  //   if (white.contains(pos)) {
+  //     piece.type = PieceType.white;
+  //   } else 
+  //   if (piece.path) {
+  //     piece.type = PieceType.path;
+  //   } 
+  //   return piece;
+  // });
+  List<int> board = [
+    2,0,2,0,2,0,2,0,
+    0,2,0,2,0,2,0,2,
+    2,0,2,0,2,0,2,0,
+    0,1,0,1,0,1,0,1,
+    1,0,1,0,1,0,1,0,
+    0,3,0,3,0,3,0,3,
+    3,0,3,0,3,0,3,0,
+    0,3,0,3,0,3,0,3
+  ];
 
   List<int> targetPaths = [];
   int selectPiece = -1;
@@ -38,7 +48,7 @@ class _BoardGameState extends State<BoardGame> {
       var pos = i * 8;
       str += '\n${board
         .getRange(pos, pos + 8)
-        .map((b) => b.num > 0 ? '[${b.num}]' : '   ')
+        .map((b) => b > 0 ? '[$b]' : '   ')
         .join('')}';
     }
 
@@ -51,14 +61,14 @@ class _BoardGameState extends State<BoardGame> {
   
     List<int> targets = [];
 
-    if (piece.type == PieceType.white) {
+    if (piece.pieceType == PieceType.white) {
       // superior à esquerda / superior à direita
       var topLeft = (piece.row - 1) * 8 + (piece.col - 1);
       var topRight = (piece.row - 1) * 8 + (piece.col + 1);
       print([ topLeft, topRight ]);
       targets.addAll([ topLeft, topRight ]);
     } else
-    if (piece.type == PieceType.black) {
+    if (piece.pieceType == PieceType.black) {
       // inferior à esquerda / inferior à direita
       var bottomLeft = (piece.row + 1) * 8 + (piece.col - 1);
       var bottomRight = (piece.row + 1) * 8 + (piece.col + 1);
@@ -90,25 +100,48 @@ class _BoardGameState extends State<BoardGame> {
         padding: const EdgeInsets.all(10),
         alignment: Alignment.center,
         child: GridView.builder(
-          itemCount: board.length,
           shrinkWrap: true,
+          itemCount: board.length,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 8
           ), 
           itemBuilder: (BuildContext ctx, int pos) {
-            Piece piece = board[pos];          
+            Piece piece = Piece(
+              position: pos,
+              type: board[pos]
+            );
+
             return Square(
               select: pos == selectPiece,
               piece: piece,
-              onTap: (){
-                _calculatePathTarget(piece);
-              },
+              onTap: (){},
             );
           },
         ),
       ),
     );
   }
+
+  // Widget _boadGrid() {
+  //   return GridView.builder(
+  //     itemCount: board1.length,
+  //     shrinkWrap: true,
+  //     physics: const NeverScrollableScrollPhysics(),
+  //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+  //       crossAxisCount: 8
+  //     ), 
+  //     itemBuilder: (BuildContext ctx, int pos) {
+  //       Piece piece = board1[pos];          
+  //       return Square(
+  //         select: pos == selectPiece,
+  //         piece: piece,
+  //         onTap: (){
+  //           _calculatePathTarget(piece);
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
 }

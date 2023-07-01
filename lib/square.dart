@@ -33,13 +33,13 @@ class Square extends StatelessWidget {
         )),
       );
     } else 
-    if(piece.type == PieceType.path){
+    if(piece.pieceType == PieceType.path){
       color = select ? Colors.green.shade600 : Colors.brown.shade400;
       child = Text(piece.label, style: const TextStyle(
         color: Colors.white
       ));
     } else 
-    if(piece.type == PieceType.target){
+    if(piece.pieceType == PieceType.target){
       color = Colors.green.shade600;
       child = Text(piece.label, style: const TextStyle(
         color: Colors.white
