@@ -12,21 +12,6 @@ class BoardGame extends StatefulWidget {
 
 class _BoardGameState extends State<BoardGame> {
 
-  // List<Piece> board1 = List.generate(64, (pos){
-  //   var piece = Piece(position: pos);
-  //   var white = [41, 43, 45, 47, 48, 50, 52, 54, 57, 59, 61, 63];
-  //   var black = [0, 2, 4, 6, 9, 11, 13, 15, 16, 18, 20, 22];
-  //   if (black.contains(pos)) {
-  //     piece.type = PieceType.black;
-  //   } else
-  //   if (white.contains(pos)) {
-  //     piece.type = PieceType.white;
-  //   } else 
-  //   if (piece.path) {
-  //     piece.type = PieceType.path;
-  //   } 
-  //   return piece;
-  // });
   List<int> board = [
     2,0,2,0,2,0,2,0,
     0,2,0,2,0,2,0,2,
@@ -38,8 +23,10 @@ class _BoardGameState extends State<BoardGame> {
     0,3,0,3,0,3,0,3
   ];
 
+  PieceType vez = PieceType.white;
   List<int> targetPaths = [];
-  int selectPiece = -1;
+  Piece? selectPiece;
+  
 
   void _printBoard() {
     var str = '';
@@ -55,30 +42,76 @@ class _BoardGameState extends State<BoardGame> {
     print(str);
   }
 
-  void _calculatePathTarget(Piece piece) {
-
-    piece.log();
-  
+  List<int> _checkNextPaths(Piece piece) {
     List<int> targets = [];
 
-    if (piece.pieceType == PieceType.white) {
-      // superior à esquerda / superior à direita
-      var topLeft = (piece.row - 1) * 8 + (piece.col - 1);
-      var topRight = (piece.row - 1) * 8 + (piece.col + 1);
-      print([ topLeft, topRight ]);
-      targets.addAll([ topLeft, topRight ]);
-    } else
-    if (piece.pieceType == PieceType.black) {
-      // inferior à esquerda / inferior à direita
-      var bottomLeft = (piece.row + 1) * 8 + (piece.col - 1);
-      var bottomRight = (piece.row + 1) * 8 + (piece.col + 1);
-      print([ bottomLeft, bottomRight ]);
-      targetPaths.addAll([ bottomLeft, bottomRight ]);
+    if (piece.white) {
+      // superior à esquerda
+      int topLeft = (piece.row - 1) * 8 + (piece.col - 1);
+      var topLeftPiece = Piece(position: topLeft, type: board[topLeft]);
+
+      if (topLeftPiece.black) {
+        targets.addAll(_checkNextPaths(topLeftPiece));
+      } else {
+        targets.add(topLeft);
+      }
+      
     }
 
+    return targets;
+  }
+
+  void _checkNextPosition() {
+    
+  }
+
+  void _calculatePathTarget(Piece piece) {
+
+    //piece.log();
+    List<int> targets = [];
+
+    for (var p in piece.targets) {
+      var target = Piece(position: p, type: board[p]);
+      if (!target.player) {
+        targets.add(p);
+      } else {
+        print(target.targets);
+      }
+    }
+  
+
+    // if (piece.white) {
+    //   // superior à esquerda
+    //   int topLeft = (piece.row - 1) * 8 + (piece.col - 1);
+    //   if (board[topLeft] == 1) {
+    //     targets.add(topLeft);
+    //   }
+
+    //   // superior à direita
+    //   int topRight = (piece.row - 1) * 8 + (piece.col + 1);
+    //   if (board[topRight] == 1) {
+    //     targets.add(topRight);
+    //   }
+    // } else
+    // if (piece.black) {
+    //   // inferior à esquerda 
+    //   int bottomLeft = (piece.row + 1) * 8 + (piece.col - 1);
+    //   if (board[bottomLeft] == 1) {
+    //     targets.add(bottomLeft);
+    //   }
+
+    //   // inferior à direita
+    //   int bottomRight = (piece.row + 1) * 8 + (piece.col + 1);
+    //   if (board[bottomRight] < 7) {
+    //     targets.add(bottomRight);
+    //   }
+    // }
+
+    //print(targets);
+    
     if (targets.isNotEmpty) {
       setState(() { 
-        selectPiece = piece.position;
+        selectPiece = piece;
         targetPaths = targets;
       });
     }
@@ -86,14 +119,21 @@ class _BoardGameState extends State<BoardGame> {
   }
 
   void _movePieceToPosition(Piece piece) {
-    
+    //piece.log();
+
+    setState(() {
+      board[selectPiece!.position] = 1;
+      board[piece.position] = selectPiece!.type;
+      selectPiece = null;
+      targetPaths.clear();
+      vez = vez == PieceType.black 
+        ? PieceType.white 
+        : PieceType.black;
+    });
   }
 
   @override
-  Widget build(BuildContext context) {
-
-    _printBoard();
-   
+  Widget build(BuildContext context) {   
     return Scaffold(
       backgroundColor: Colors.grey,
       body: Container(
@@ -107,15 +147,28 @@ class _BoardGameState extends State<BoardGame> {
             crossAxisCount: 8
           ), 
           itemBuilder: (BuildContext ctx, int pos) {
-            Piece piece = Piece(
-              position: pos,
-              type: board[pos]
-            );
+            int type = board[pos];
 
-            return Square(
-              select: pos == selectPiece,
-              piece: piece,
-              onTap: (){},
+            if (type > 0) {
+              Piece piece = Piece(position: pos, type: type);
+              bool target = targetPaths.contains(pos);
+              bool select = pos == selectPiece?.position;
+              return Square(
+                piece: piece,
+                select: target || select,
+                onTap: (){
+                  if (piece.player && piece.pieceType == vez) {
+                    _calculatePathTarget(piece);
+                  } else 
+                  if(target){
+                    _movePieceToPosition(piece);
+                  }
+                },
+              );
+            }
+
+            return Container(
+              color: Colors.yellow.shade100,
             );
           },
         ),
@@ -123,25 +176,5 @@ class _BoardGameState extends State<BoardGame> {
     );
   }
 
-  // Widget _boadGrid() {
-  //   return GridView.builder(
-  //     itemCount: board1.length,
-  //     shrinkWrap: true,
-  //     physics: const NeverScrollableScrollPhysics(),
-  //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-  //       crossAxisCount: 8
-  //     ), 
-  //     itemBuilder: (BuildContext ctx, int pos) {
-  //       Piece piece = board1[pos];          
-  //       return Square(
-  //         select: pos == selectPiece,
-  //         piece: piece,
-  //         onTap: (){
-  //           _calculatePathTarget(piece);
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
-
+  
 }
