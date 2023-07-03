@@ -4,12 +4,12 @@ import 'package:flutter_damas/square.dart';
 
 List<int> initialBoard = [
     2,0,2,0,2,0,2,0,
-    0,2,0,2,0,1,0,2,
-    2,0,2,0,2,0,2,0,
-    0,1,0,1,0,1,0,1,
-    1,0,2,0,1,0,1,0,
+    0,2,0,2,0,2,0,2,
+    1,0,2,0,2,0,1,0,
+    0,2,0,1,0,1,0,1,
+    1,0,1,0,1,0,2,0,
     0,3,0,3,0,3,0,3,
-    1,0,3,0,3,0,3,0,
+    3,0,3,0,3,0,3,0,
     0,3,0,3,0,3,0,3
   ];
 
@@ -57,10 +57,10 @@ class _BoardGameState extends State<BoardGame> {
         if (board[pos] == 1 && canNotBack){
           targets.add(pos); 
 
-          // verifica se a poxima posicao é tábém é um path
+          // verifica se a poxima posicao tmbbém é um path
           // senão também sai do loop
           if (diagonal.length > j+1 && 
-            board[diagonal[j+1]] == 1) break;
+              board[diagonal[j+1]] == 1) break;
 
         }
 
@@ -80,7 +80,20 @@ class _BoardGameState extends State<BoardGame> {
 
   void _movePieceToPosition(Piece piece) {
 
-    setState(() {
+    // procura a diagonal que contem o target
+    selectPiece!.diagonais
+      .firstWhere((d) => d.contains(piece.position))
+      .forEach((i) {
+        var dir = selectPiece!.white 
+          ? i > piece.position 
+          : i < piece.position;
+        
+        if (dir && board[i] != 1) {
+          board[i] = 1;
+        }
+      });
+    
+    setState(() {      
       board[selectPiece!.position] = 1;
       board[piece.position] = selectPiece!.type;
       selectPiece = null;
