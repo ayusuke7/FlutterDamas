@@ -6,11 +6,6 @@ enum PieceType {
   white,
 }
 
-enum PieceSide {
-  left,
-  right
-}
-
 class Piece {
 
   int position;
@@ -33,12 +28,6 @@ class Piece {
   
   PieceType get pieceType => PieceType.values[type-1];
 
-  PieceSide get pieceSide => col >= 4 ? PieceSide.right : PieceSide.left;
-
-  String get name => pieceType.name.characters.first.toUpperCase();
-
-  String get label => "$position";
-
   Color get color {
     if (pieceType == PieceType.black) {
       return Colors.black;
@@ -50,39 +39,58 @@ class Piece {
     }
   }
 
-  List<int> get targets {
-    List<int> temp = [];
-    if (white) {
-      // superior à esquerda
-      if (col > 0) {
-        int topLeft = (row - 1) * 8 + (col - 1);
-        temp.add(topLeft);
-      }
-      // superior à direita
-      if (col < 7) {
-        int topRight = (row - 1) * 8 + (col + 1);
-        temp.add(topRight);
-      }
-    } else
-    if (black) {
-      // inferior à esquerda 
-      if (col > 0) {
-        int bottomLeft = (row + 1) * 8 + (col - 1);
-        temp.add(bottomLeft);
-      }
-      // inferior à direita
-      if (col < 7) {
-        int bottomRight = (row + 1) * 8 + (col + 1);
-        temp.add(bottomRight);
-      }
+  List<List<int>> get diagonais {
+    List<List<int>> positions = [[],[],[],[]];
+
+    // superior à esquerda
+    int leftTopRow = row;
+    int leftTopCol = col;
+
+    while (leftTopRow > 0 && leftTopCol > 0) {
+      int topLeft = (leftTopRow - 1) * 8 + (leftTopCol - 1);
+      positions[0].add(topLeft);
+      leftTopRow--;
+      leftTopCol--;
     }
-    return temp;
+
+    // superior à direira
+    int topRightRow = row;
+    int topRightCol = col;
+
+    while (topRightRow > 0 && topRightCol < 7) {
+      int topRight = (topRightRow - 1) * 8 + (topRightCol + 1);
+      positions[1].add(topRight);
+      topRightRow--;
+      topRightCol++;
+    }
+
+    // inferior à direita
+    int rightBottomRow = row;
+    int rightBottomCol = col;
+
+    while (rightBottomRow < 7 && rightBottomCol < 7) {
+      int bottomRight = (rightBottomRow + 1) * 8 + (rightBottomCol + 1);
+      positions[2].add(bottomRight);
+      rightBottomRow++;
+      rightBottomCol++;
+    }
+
+    // inferior à esquerda
+    int leftBottomRow = row;
+    int leftBottomCol = col;
+
+    while (leftBottomRow < 7 && leftBottomCol > 0) {
+      int bottomLeft = (leftBottomRow + 1) * 8 + (leftBottomCol - 1);
+      positions[3].add(bottomLeft);
+      leftBottomRow++;
+      leftBottomCol--;
+    }
+
+    return positions;
   }
 
   void log() {
-    print("($row, $col) / $position / ${pieceType.name} / ${pieceSide.name}");
+    print("($row, $col) / $position / ${pieceType.name}");
   }
-
-
 
 }
