@@ -1,16 +1,23 @@
-# flutter_damas
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
-A new Flutter project.
+# Flutter Damas
 
-## Getting Started
+The flutter damas with flutter web/linux/ios/android
 
-This project is a starting point for a Flutter application.
+## Screenshots
 
-A few resources to get you started if this is your first Flutter project:
+![App Screenshot](./screens/flutter_damas.gif)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Running
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Clone to project
+
+```bash
+  git clone https://github.com/ayusuke7/FlutterDamas
+
+  cd FlutterDamas
+
+  flutter pub get
+
+  flutter run
+```
